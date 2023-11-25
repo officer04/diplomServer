@@ -21,14 +21,14 @@ class authController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ message: 'Ошибка при регистрации', errors });
       }
-      const { username, password } = req.body;
-      const candidate = await User.findOne({ username });
+      const { username, password, email } = req.body;
+      const candidate = await User.findOne({ email });
       if (candidate) {
-        return res.status(400).json({ message: 'Пользователь с таким именем уже существует' });
+        return res.status(400).json({ message: 'Пользователь с таким емайл уже существует' });
       }
       const hashPassword = bcrypt.hashSync(password, 7);
       const useRole = await Role.findOne({ value: 'USER' });
-      const user = new User({ username, password: hashPassword, roles: [useRole.value] });
+      const user = new User({ username, email, password: hashPassword, roles: [useRole.value] });
       await user.save();
       return res.json({ message: 'Пользователь успешно зарегистрирован' });
     } catch (e) {
@@ -39,10 +39,11 @@ class authController {
 
   async login(req, res) {
     try {
-      const { username, password } = req.body;
-      const user = await User.findOne({ username });
+      const { password, email } = req.body;
+      console.log(email);
+      const user = await User.findOne({ email });
       if (!user) {
-        return res.status(400).json({ message: `Пользователь ${username} не найден` });
+        return res.status(400).json({ message: `Пользователь c почтой ${email} не найден` });
       }
       const validPassword = bcrypt.compareSync(password, user.password);
       if (!validPassword) {
