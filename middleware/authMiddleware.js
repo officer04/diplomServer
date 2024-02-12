@@ -7,9 +7,11 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    const token = req.headers.authorization.split(' ')[1];
+    // const token = req.headers.authorization.split(' ')[1];
+    const token = req.headers.authorization
+
     if (!token) {
-      return res.status(403).json({ message: 'Пользователь не авторизован' });
+      return res.status(401).json({ message: 'Пользователь не авторизован' });
     }
 
     const decoderData = jwt.verify(token, secret);
@@ -17,6 +19,6 @@ module.exports = (req, res, next) => {
     next();
   } catch (e) {
     console.log(e);
-    return res.status(403).json({ message: 'Пользователь не авторизован' });
+    return res.status(401).json({ message: 'Пользователь не авторизован' });
   }
 };
