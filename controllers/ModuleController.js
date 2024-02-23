@@ -2,6 +2,7 @@ const Module = require('../models/Module.js');
 
 class ModuleController {
   async create(req, res) {
+    console.log(req);
     try {
       const doc = new Module({
         title: req.body.title,
@@ -36,31 +37,43 @@ class ModuleController {
     }
   }
 
-  // async update(req, res) {
-  //   try {
-  //     const postId = req.params.id;
+  async update(req, res) {
+    try {
+      const moduleId = req.params.id;
 
-  //     const post = await Cours.findOneAndUpdate(
-  //       {
-  //         _id: postId,
-  //       },
-  //       {
-  //         title: req.body.title,
-  //         price: req.body.price,
-  //         description: req.body.description,
-  //       },
-  //       { new: true },
-  //     );
-  //     if (!post) return res.status(404).json({ message: 'Нет такой карты с ценой' });
+      const post = await Module.findOneAndUpdate(
+        {
+          _id: moduleId,
+        },
+        {
+          title: req.body.title,
+        },
+        { new: true },
+      );
+      if (!post) return res.status(404).json({ message: 'Нет такого модуля' });
 
-  //     res.json(post);
-  //   } catch (err) {
-  //     console.log(err);
-  //     return res.status(500).json({
-  //       message: 'Не удалось получить карту с ценой',
-  //     });
-  //   }
-  // }
+      res.json(post);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: 'Не удалось обновить модуль',
+      });
+    }
+  }
+
+  async getModuleOne(req, res) {
+    try {
+      const moduleId = req.params.id;
+      const module = await Module.findOne({ _id: moduleId });
+      console.log(module)
+      res.status(200).json(module);
+    } catch (e) {
+      console.log(e);
+      return res.status(500).json({
+        message: 'Не удалось получить модули',
+      });
+    }
+  }
 
   async getModule(req, res) {
     try {

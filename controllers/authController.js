@@ -9,11 +9,13 @@ const { createHash } = require('crypto');
 const nodemailer = require('nodemailer');
 const ResetPasswordRequest = require('../models/ResetPasswordRequest');
 const UserCours = require('../models/UserCours');
+const userRole = require("./../metadata/roles/userRole")
+const adminRole = require("./../metadata/roles/adminRole")
 
-const generateAccessToken = (id, roles, username, email) => {
+const generateAccessToken = (id, role, username, email) => {
   const payload = {
     id,
-    roles,
+    role,
     username,
     email,
   };
@@ -34,10 +36,10 @@ class AuthController {
         return res.status(400).json({ message: 'Пользователь с таким емайл уже существует' });
       }
       const hashPassword = bcrypt.hashSync(password, 7);
-      const useRole = await Role.findOne({ value: 'USER' });
-      const user = new User({ username, email, password: hashPassword, roles: [useRole.value] });
+      const role = await Role.findOne({ _id: userRole._id });
+      const user = new User({ username, email, password: hashPassword, role: role.title });
       await user.save();
-      const token = generateAccessToken(user._id, user.roles, user.username, user.email);
+      const token = generateAccessToken(user._id, user.role, user.username, user.email);
       return res.json({ token });
     } catch (e) {
       res.status(400).json({ message: 'Registration error' });
@@ -57,10 +59,10 @@ class AuthController {
         return res.status(400).json({ message: `Введен не правильный пароль` });
       }
 
-      const token = generateAccessToken(user._id, user.roles, user.username, user.email);
+      const token = generateAccessToken(user._id, user.role, user.username, user.email);
       return res.json({ token });
     } catch (e) {
-      res.status(400).json({ message: 'Login error' });
+      res.status(500).json({ message: 'Login error' });
     }
   }
 
@@ -94,18 +96,18 @@ class AuthController {
       );
 
       if (!userUpdate) {
-        res.status(400).json({ message: 'Такого пользоватля нет' });
+        res.status(400).json({ message: 'Такого пользователя нет' });
       }
 
       const token = generateAccessToken(
         userUpdate._id,
-        userUpdate.roles,
+        userUpdate.role,
         userUpdate.username,
         userUpdate.email,
       );
       return res.json({ token });
     } catch (e) {
-      res.status(400).json({ message: 'Error change' });
+      res.status(500).json({ message: 'Error change' });
     }
   }
 
@@ -167,7 +169,7 @@ class AuthController {
 
       res.status(201).json('');
     } catch (e) {
-      res.status(400).json({ message: 'Error change' });
+      res.status(500).json({ message: 'Error change' });
     }
   }
 
@@ -180,7 +182,7 @@ class AuthController {
       const request = await ResetPasswordRequest.findOne({ _id: requestId });
 
       if (!request || currentDate > request.expiryAt) {
-        return res.status(400).json('Устаревшая заяввка на сброс пароля');
+        return res.status(400).json('Устаревшая заявка на сброс пароля');
       }
 
       const hashNewPassword = bcrypt.hashSync(body.newPassword, 7);
@@ -199,7 +201,7 @@ class AuthController {
 
       return res.status(201).json('');
     } catch (e) {
-      res.status(400).json({ message: 'Error change' });
+      res.status(500).json({ message: 'Error change' });
     }
   }
 

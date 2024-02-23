@@ -8,7 +8,6 @@ class CoursController {
         title: req.body.title,
         description: req.body.description,
         imgUrl: req.body.imgUrl,
-        test: '65c3156d99bdf41329dfb5ff',
       });
 
       await doc.save();
@@ -39,33 +38,33 @@ class CoursController {
     }
   }
 
-  // async update(req, res) {
-  //   try {
-  //     const postId = req.params.id;
+  async update(req, res) {
+    try {
+      const postId = req.params.id;
 
-  //     const post = await Cours.findOneAndUpdate(
-  //       {
-  //         _id: postId,
-  //       },
-  //       {
-  //         title: req.body.title,
-  //         price: req.body.price,
-  //         description: req.body.description,
-  //       },
-  //       { new: true },
-  //     );
-  //     if (!post) return res.status(404).json({ message: 'Нет такой карты с ценой' });
+      const post = await Cours.findOneAndUpdate(
+        {
+          _id: postId,
+        },
+        {
+          title: req.body.title,
+          description: req.body.description,
+          imgUrl: req.body.imgUrl,
+        },
+        { new: true },
+      );
+      if (!post) return res.status(404).json({ message: 'Нет такого курса' });
 
-  //     res.json(post);
-  //   } catch (err) {
-  //     console.log(err);
-  //     return res.status(500).json({
-  //       message: 'Не удалось получить карту с ценой',
-  //     });
-  //   }
-  // }
+      res.json(post);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: 'Не удалось изменить курс',
+      });
+    }
+  }
 
-  async getCours(req, res) {
+  async getOneCours(req, res) {
     try {
       const coursId = req.params.id;
       const modules = await Cours.findOne({ _id: coursId });
@@ -79,14 +78,25 @@ class CoursController {
     }
   }
 
-  async getAll(req, res) {
+  async getCoursesUser(req, res) {
     try {
       const userId = req.user.id;
       const userCours = await UserCours.find({ userId });
       const courdId = userCours.map((item) => item.coursId);
       const cours = await Cours.find({ _id: courdId });
-      
+
       res.status(200).json(cours);
+    } catch (e) {
+      return res.status(500).json({
+        message: 'Не удалось получить курсы',
+      });
+    }
+  }
+
+  async getAll(req, res) {
+    try {
+      const courses = await Cours.find();
+      res.status(200).json(courses);
     } catch (e) {
       return res.status(500).json({
         message: 'Не удалось получить курсы',

@@ -9,6 +9,9 @@ router.post('/', controller.create);
 router.delete('/:id', controller.remove);
 router.get('', controller.getAll);
 router.get('/:id', controller.getModule);
+router.patch('/:id', controller.update);
+router.get('/details/:id', controller.getModuleOne);
+
 
 
 

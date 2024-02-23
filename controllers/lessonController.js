@@ -40,12 +40,12 @@ class LessonController {
         _id: postId,
       });
 
-      if (!lesson) return res.status(404).json({ message: 'Нет такого курса' });
+      if (!lesson) return res.status(404).json({ message: 'Нет такого урока' });
 
       res.status(204).end();
     } catch (err) {
       return res.status(500).json({
-        message: 'Не удалось получить статьи',
+        message: 'Не удалось получить урок',
       });
     }
   }
@@ -86,8 +86,7 @@ class LessonController {
       const moduleTitle = module.title;
       const coursInfo = { title: cours.title, coursId: cours._id };
 
-      const lessonFilter = lessons.sort((a, b) => a.lessonNumber - b.lessonNumber);
-      // console.log(lessonFilter);
+      lessons.sort((a, b) => a.lessonNumber - b.lessonNumber);
 
       const response = {
         moduleTitle,
@@ -108,24 +107,22 @@ class LessonController {
     try {
       const { id } = req.params;
       const lesson = await Lesson.findOne({ _id: id });
-      const moduleId = lesson.moduleId;
-      const cours = await Module.findOne({ _id: moduleId });
-      const coursId = cours.coursId;
-      const course = await Cours.findOne({ _id: coursId });
+      const module = await Module.findOne({ _id: lesson.moduleId });
+      const cours = await Cours.findOne({ _id: module.coursId });
 
       const response = {
-        title: lesson.title,
+        lessonTitle: lesson.title,
         youtubeVideoId: lesson.youtubeVideoId,
         moduleId: lesson.moduleId,
-        titileModule: cours.title,
-        coursId: cours.coursId,
-        titleCours: course.title,
+        moduleTitle: module.title,
+        coursId: module.coursId,
+        coursTitle: cours.title,
       };
       res.status(200).json(response);
     } catch (e) {
       console.log(e);
       return res.status(500).json({
-        message: 'Не удалось получить карточки',
+        message: 'Не удалось получить урок',
       });
     }
   }

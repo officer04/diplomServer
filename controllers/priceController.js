@@ -1,4 +1,5 @@
 const Price = require('../models/Price.js');
+const Role = require('../models/Role.js');
 
 class PriceController {
   async remove(req, res) {
@@ -11,13 +12,11 @@ class PriceController {
 
       if (!post) res.status(404).json({ message: 'Нет такой статьи' });
 
-      res.json({
-        success: true,
-      });
+      res.status(201).end();
     } catch (err) {
       console.log(err);
       res.status(500).json({
-        message: 'Не удалось получить статьи',
+        message: 'Не удалось получить карту с ценой',
       });
     }
   }
