@@ -20,7 +20,7 @@ const generateAccessToken = (id, role, username, email) => {
     email,
   };
 
-  return jwt.sign(payload, secret, { expiresIn: '24h' });
+  return jwt.sign(payload, secret, { expiresIn: '2h' });
 };
 
 class AuthController {
@@ -36,7 +36,7 @@ class AuthController {
         return res.status(400).json({ message: 'Пользователь с таким емайл уже существует' });
       }
       const hashPassword = bcrypt.hashSync(password, 7);
-      const role = await Role.findOne({ _id: userRole._id });
+      const role = await Role.findOne({ _id: userRole.id });
       const user = new User({ username, email, password: hashPassword, role: role.title });
       await user.save();
       const token = generateAccessToken(user._id, user.role, user.username, user.email);

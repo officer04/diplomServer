@@ -8,7 +8,7 @@ const controller = require('./../controllers/coursController');
 router.post('/', controller.create);
 router.delete('/:id', controller.remove);
 router.patch('/:id', controller.update);
-// router.get('', authMiddleware, controller.getCoursesUser);
+router.get('/student', authMiddleware, controller.getCoursesUser);
 router.get('', authMiddleware, controller.getAll);
 router.get('/:id', controller.getOneCours);
 
